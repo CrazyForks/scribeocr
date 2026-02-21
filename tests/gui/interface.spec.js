@@ -29,7 +29,27 @@ describe('Use delete and recognize word buttons', function () {
       'simple.png',
     ]);
 
-    await customActions.recognize();
+    // Click on the 'Recognize' tab
+    await driver.findElement(By.id('nav-recognize-tab')).click();
+
+    const recognizeBtn = await driver.findElement(By.id('recognizeAll'));
+    await driver.wait(until.elementIsEnabled(recognizeBtn), 5000, 'Recognize All button was not enabled after upload');
+
+    await recognizeBtn.click();
+
+    // The button should be disabled immediately after clicking
+    assert.isFalse(await recognizeBtn.isEnabled(), 'Recognize button should be disabled while recognition is running');
+
+    // Wait for recognize progress bar to fill up
+    const progressBar = await driver.findElement(By.css('#recognize-recognize-progress-collapse .progress-bar'));
+    await driver.wait(async () => {
+      const maxValue = await progressBar.getAttribute('aria-valuemax');
+      const currentValue = await progressBar.getAttribute('aria-valuenow');
+      return currentValue === maxValue;
+    }, 40000, 'Recognize progress bar did not reach maximum value in time');
+
+    // After recognition completes, the button should be re-enabled
+    await driver.wait(until.elementIsEnabled(recognizeBtn), 5000, 'Recognize button was not re-enabled after recognition completed');
 
     const text = await driver.executeScript('return df.scribe.exportData("text")');
 

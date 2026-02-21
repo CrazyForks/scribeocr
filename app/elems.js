@@ -51,6 +51,8 @@ class nav {
   static navLayout = /** @type {HTMLDivElement} */(document.getElementById('nav-layout'));
 
   static navRecognize = /** @type {HTMLDivElement} */(document.getElementById('nav-recognize'));
+
+  static navDownload = /** @type {HTMLDivElement} */(document.getElementById('nav-download'));
 }
 
 class recognize {
@@ -88,6 +90,8 @@ class recognize {
 
   static buildLabelOptionVanilla = /** @type {HTMLInputElement} */(document.getElementById('buildLabelOptionVanilla'));
 
+  static buildOptions = /** @type {HTMLDivElement} */(document.getElementById('buildOptions'));
+
   // Advanced recognition options
   static advancedRecognitionOptions1 = /** @type {HTMLDivElement} */(document.getElementById('advancedRecognitionOptions1'));
 
@@ -102,6 +106,31 @@ class recognize {
   static enableUpscale = /** @type {HTMLInputElement} */(document.getElementById('enableUpscale'));
 
   static tessParameters = /** @type {HTMLTextAreaElement} */(document.getElementById('tessParameters'));
+
+  // Textract options
+  static oemLabelOptionTextract = /** @type {HTMLInputElement} */(document.getElementById('oemLabelOptionTextract'));
+
+  static textractOptions = /** @type {HTMLDivElement} */(document.getElementById('textractOptions'));
+
+  static textractFeatureOptions = /** @type {HTMLDivElement} */(document.getElementById('textractFeatureOptions'));
+
+  static textractAccessKeyId = /** @type {HTMLInputElement} */(document.getElementById('textractAccessKeyId'));
+
+  static textractSecretAccessKey = /** @type {HTMLInputElement} */(document.getElementById('textractSecretAccessKey'));
+
+  static textractSessionToken = /** @type {HTMLInputElement} */(document.getElementById('textractSessionToken'));
+
+  static textractRegion = /** @type {HTMLInputElement} */(document.getElementById('textractRegion'));
+
+  static textractAnalyzeLayout = /** @type {HTMLInputElement} */(document.getElementById('textractAnalyzeLayout'));
+
+  static textractAnalyzeTables = /** @type {HTMLInputElement} */(document.getElementById('textractAnalyzeTables'));
+
+  static textractAcceptCharges = /** @type {HTMLInputElement} */(document.getElementById('textractAcceptCharges'));
+
+  static textractAcceptChargesDiv = /** @type {HTMLDivElement} */(document.getElementById('textractAcceptChargesDiv'));
+
+  static langOptions = /** @type {HTMLDivElement} */(document.getElementById('langOptions'));
 }
 
 class evaluate {

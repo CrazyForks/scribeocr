@@ -260,7 +260,7 @@
                   d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" />
               </svg> Find</button>
             <div class="collapse find-collapse" id="editFindCollapse"
-              style="padding:0;width:100%;max-width:405px;position:absolute">
+              style="padding:0;width:100%;max-width:405px;position:absolute;z-index:4">
               <div class="card card-body" style="padding:0.5rem;position:relative;top:5px;">
                 <input type="text" id="editFind" name="find" size="2" style="width:100%" autocomplete="off">
 
@@ -676,6 +676,18 @@
                     <label></label>
                     <button type="button" id="recognizeAll" class="btn btn-info btn-sm" style="min-width:100%;"
                       disabled>Recognize Text</button>
+                    <div style="display:none;margin-top:0.3rem" id="textractAcceptChargesDiv">
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="textractAcceptCharges">
+                        <label class="form-check-label" for="textractAcceptCharges" style="font-size:0.75rem">
+                          <strong>Accept Risks</strong>
+                        </label>
+                      </div>
+                      <div style="font-size:0.7rem;color:#6c757d;padding-left:1.5em">
+                        I understand this feature may contain bugs and users assume the full risk of unexpected cloud
+                        charges.
+                      </div>
+                    </div>
                   </div>
                   <div class="col-5 col-sm-3 col-lg-2" id="basicRecognitionOptions">
                     <div class="prevent-select" style="display:inline-block">
@@ -691,25 +703,6 @@
                       </div>
                     </div>
                   </div>
-                  <div class="col col-lg-2" id="langOptions">
-                    <label>Language</label>
-                    <div class="form-group">
-                      <button data-bs-toggle="collapse" id="langLabel" data-bs-target="#collapseLang" type="button"
-                        class="btn btn-secondary btn-sm collapsed" style="min-width:100%;text-align:left"
-                        aria-expanded="false">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                          class="bi bi-translate" viewBox="0 0 16 16">
-                          <path
-                            d="M4.545 6.714 4.11 8H3l1.862-5h1.284L8 8H6.833l-.435-1.286zm1.634-.736L5.5 3.956h-.049l-.679 2.022z" />
-                          <path
-                            d="M0 2a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v3h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-3H2a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zm7.138 9.995q.289.451.63.846c-.748.575-1.673 1.001-2.768 1.292.178.217.451.635.555.867 1.125-.359 2.08-.844 2.886-1.494.777.665 1.739 1.165 2.93 1.472.133-.254.414-.673.629-.89-1.125-.253-2.057-.694-2.82-1.284.681-.747 1.222-1.651 1.621-2.757H14V8h-3v1.047h.765c-.318.844-.74 1.546-1.272 2.13a6 6 0 0 1-.415-.492 2 2 0 0 1-.94.31" />
-                        </svg>
-
-                        <div id="langLabelText" style="display:inline"> Lang: Eng</div>
-                      </button>
-
-                    </div>
-                  </div>
                   <div class="col col-lg-2" style="display:none" id="advancedRecognitionOptions1">
                     <div>
                       <label>Models</label>
@@ -719,7 +712,6 @@
                         <div class="dropdown">
                           <button class="btn btn-secondary dropdown btn-sm" type="button" data-bs-toggle="dropdown"
                             style="width:100%;text-align:left">
-                            <div style="display:inline"> Engine: </div>
                             <div id="oemLabelText" style="display:inline">Combined</div>
                           </button>
                           <ul class="dropdown-menu">
@@ -727,11 +719,23 @@
                             <li><a id="oemLabelOptionLegacy" class="dropdown-item" href="#">Tesseract Legacy</a></li>
                             <li><a id="oemLabelOptionCombined" class="dropdown-item" href="#">LSTM + Legacy Combined</a>
                             </li>
+                            <li><a id="oemLabelOptionTextract"
+                                class="dropdown-item d-flex justify-content-between align-items-center" href="#">AWS
+                                Textract <span class="d-inline-flex align-items-center"><svg
+                                    xmlns="http://www.w3.org/2000/svg" width="40" height="16" viewBox="0 0 40 16">
+                                    <rect width="40" height="16" rx="3" fill="#6c757d" /><text x="20" y="11.5"
+                                      font-family="system-ui,sans-serif" font-size="10" font-weight="600" fill="#fff"
+                                      text-anchor="middle">Alpha</text>
+                                  </svg><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="#6c757d"
+                                    class="bi bi-cloud-fill ms-2" viewBox="0 0 16 16">
+                                    <path
+                                      d="M4.406 3.342A5.53 5.53 0 0 1 8 2c2.69 0 4.923 2 5.166 4.579C14.758 6.804 16 8.137 16 9.773 16 11.569 14.502 13 12.687 13H3.781C1.708 13 0 11.366 0 9.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383" />
+                                  </svg></span></a></li>
                           </ul>
                         </div>
                       </div>
                     </div>
-                    <div class="row" style="padding-top:0.4rem;">
+                    <div class="row" style="padding-top:0.4rem;" id="buildOptions">
                       <div class="form-group">
                         <div class="dropdown">
                           <button class="btn btn-secondary dropdown btn-sm" type="button" id="build"
@@ -793,6 +797,110 @@
                         Recognition will only modify confidence metrics.
                         When disabled, running recognition may modify user-uploaded OCR data."
                             data-bs-placement="right">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="var(--bs-body-color)"
+                              class="bi bi-question-circle-fill" viewBox="0 0 16 16" style="vertical-align:baseline">
+                              <path
+                                d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.496 6.033h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286a.237.237 0 0 0 .241.247zm2.325 6.443c.61 0 1.029-.394 1.029-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94 0 .533.425.927 1.01.927z" />
+                            </svg>
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col col-lg-2" id="langOptions">
+                    <label>Language</label>
+                    <div class="form-group">
+                      <button data-bs-toggle="collapse" id="langLabel" data-bs-target="#collapseLang" type="button"
+                        class="btn btn-secondary btn-sm collapsed" style="min-width:100%;text-align:left"
+                        aria-expanded="false">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                          class="bi bi-translate" viewBox="0 0 16 16">
+                          <path
+                            d="M4.545 6.714 4.11 8H3l1.862-5h1.284L8 8H6.833l-.435-1.286zm1.634-.736L5.5 3.956h-.049l-.679 2.022z" />
+                          <path
+                            d="M0 2a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v3h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-3H2a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zm7.138 9.995q.289.451.63.846c-.748.575-1.673 1.001-2.768 1.292.178.217.451.635.555.867 1.125-.359 2.08-.844 2.886-1.494.777.665 1.739 1.165 2.93 1.472.133-.254.414-.673.629-.89-1.125-.253-2.057-.694-2.82-1.284.681-.747 1.222-1.651 1.621-2.757H14V8h-3v1.047h.765c-.318.844-.74 1.546-1.272 2.13a6 6 0 0 1-.415-.492 2 2 0 0 1-.94.31" />
+                        </svg>
+
+                        <div id="langLabelText" style="display:inline"> Lang: Eng</div>
+                      </button>
+
+                    </div>
+                  </div>
+                  <div class="col col-lg-3" style="display:none" id="textractOptions">
+                    <label>AWS Credentials
+                      <a href="#" class="d-inline-block" data-bs-toggle="tooltip" data-bs-custom-class="ttWide"
+                        title="Requests are sent directly from your browser to AWS. No credentials are stored or transmitted to any other server."
+                        data-bs-placement="right">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="var(--bs-body-color)"
+                          class="bi bi-question-circle-fill" viewBox="0 0 16 16" style="vertical-align:baseline">
+                          <path
+                            d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.496 6.033h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286a.237.237 0 0 0 .241.247zm2.325 6.443c.61 0 1.029-.394 1.029-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94 0 .533.425.927 1.01.927z" />
+                        </svg>
+                      </a>
+                    </label>
+                    <div class="row">
+                      <div class="form-group">
+                        <div class="input-group input-group-sm" style="margin-bottom:0.3rem">
+                          <span class="input-group-text" style="width:40%">Access Key ID</span>
+                          <input type="password" id="textractAccessKeyId" class="form-control btn-sm"
+                            autocomplete="off">
+                          <button class="btn btn-outline-secondary textract-toggle-vis" type="button"
+                            data-target="textractAccessKeyId">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor"
+                              viewBox="0 0 16 16">
+                              <path
+                                d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z" />
+                              <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0" />
+                            </svg>
+                          </button>
+                        </div>
+                        <div class="input-group input-group-sm" style="margin-bottom:0.3rem">
+                          <span class="input-group-text" style="width:40%">Secret Key</span>
+                          <input type="password" id="textractSecretAccessKey" class="form-control btn-sm"
+                            autocomplete="off">
+                          <button class="btn btn-outline-secondary textract-toggle-vis" type="button"
+                            data-target="textractSecretAccessKey">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor"
+                              viewBox="0 0 16 16">
+                              <path
+                                d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z" />
+                              <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0" />
+                            </svg>
+                          </button>
+                        </div>
+                        <div class="input-group input-group-sm" style="margin-bottom:0.3rem">
+                          <span class="input-group-text" style="width:40%">Session Token</span>
+                          <input type="password" id="textractSessionToken" class="form-control btn-sm"
+                            autocomplete="off" placeholder="(optional)">
+                          <button class="btn btn-outline-secondary textract-toggle-vis" type="button"
+                            data-target="textractSessionToken">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor"
+                              viewBox="0 0 16 16">
+                              <path
+                                d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z" />
+                              <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0" />
+                            </svg>
+                          </button>
+                        </div>
+                        <div class="input-group input-group-sm" style="margin-bottom:0.3rem">
+                          <span class="input-group-text" style="width:40%">Region</span>
+                          <input type="text" id="textractRegion" class="form-control btn-sm" autocomplete="off"
+                            value="us-east-1">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col col-lg-2" style="display:none" id="textractFeatureOptions">
+                    <label>Options</label>
+                    <div class="row">
+                      <div class="form-group">
+                        <div class="form-check form-switch">
+                          <label><input class="form-check-input" type="checkbox" id="textractAnalyzeLayout">
+                            Layout Analysis</label>
+                          <label><input class="form-check-input" type="checkbox" id="textractAnalyzeTables">
+                            Table Analysis</label>
+                          <a href="#" class="d-inline-block" data-bs-toggle="tooltip"
+                            title="Table analysis requires layout analysis." data-bs-placement="right">
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="var(--bs-body-color)"
                               class="bi bi-question-circle-fill" viewBox="0 0 16 16" style="vertical-align:baseline">
                               <path
@@ -1811,8 +1919,7 @@
                     font-family="system-ui,sans-serif" font-size="10" font-weight="600" fill="#fff"
                     text-anchor="middle">Beta</text>
                 </svg>
-                <a href="#" class="d-inline-block" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-wide"
-                  title=""
+                <a href="#" class="d-inline-block" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-wide" title=""
                   data-bs-original-title="Automatically process multiple documents in sequence and download the results. The interactive viewer is disabled during batch processing."
                   data-bs-placement="right">
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="var(--bs-body-color)"

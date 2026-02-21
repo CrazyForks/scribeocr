@@ -8,6 +8,7 @@ import { insertAlertMessage } from './app/utils/warningMessages.js';
 import { ScribeViewer } from './scribe-ui/viewer.js';
 
 import { elem } from './app/elems.js';
+import { RecognitionModelTextractBrowser } from './scribe-ui/scribe.js/cloud-adapters/aws-textract/RecognitionModelAwsTextractBrowser.js';
 import { ProgressBars } from './app/utils/progressBars.js';
 
 ScribeViewer.enableCanvasSelection = true;
@@ -47,6 +48,8 @@ const progressHandler = (message) => {
   } else if (message.type === 'importPDF') {
     ProgressBars.active.increment();
     if (ScribeViewer.state.cp.n === message.n) ScribeViewer.displayPage(message.n);
+  } else if (message.type === 'recognize') {
+    ProgressBars.active.increment();
   } else if (message.type === 'render') {
     if (ProgressBars.active === ProgressBars.download) ProgressBars.active.increment();
   }
@@ -122,6 +125,7 @@ elem.info.intermediatePDF.addEventListener('click', () => {
 elem.view.displayMode.addEventListener('change', () => {
   scribe.opt.displayMode = /** @type {"invis" | "ebook" | "eval" | "proof"} */(elem.view.displayMode.value);
   ScribeViewer.displayPage(ScribeViewer.state.cp.n);
+  enableDisableDownloadPDFAlert();
 });
 
 scribe.opt.warningHandler = (x) => insertAlertMessage(x, false);
@@ -526,11 +530,35 @@ elem.info.enableEval.addEventListener('click', () => {
 });
 
 elem.info.enableAdvancedRecognition.addEventListener('click', () => {
-  elem.recognize.advancedRecognitionOptions1.style.display = elem.info.enableAdvancedRecognition.checked ? '' : 'none';
-  elem.recognize.advancedRecognitionOptions2.style.display = elem.info.enableAdvancedRecognition.checked ? '' : 'none';
-  elem.recognize.advancedRecognitionOptions3.style.display = elem.info.enableAdvancedRecognition.checked ? '' : 'none';
-  elem.recognize.basicRecognitionOptions.style.display = !elem.info.enableAdvancedRecognition.checked ? '' : 'none';
+  const adv = elem.info.enableAdvancedRecognition.checked;
+  const isTextract = elem.recognize.oemLabelText.innerHTML === 'Textract';
+
+  elem.recognize.advancedRecognitionOptions1.style.display = adv ? '' : 'none';
+  elem.recognize.buildOptions.style.display = (adv && isTextract) ? 'none' : '';
+  elem.recognize.advancedRecognitionOptions2.style.display = (adv && !isTextract) ? '' : 'none';
+  elem.recognize.advancedRecognitionOptions3.style.display = (adv && !isTextract) ? '' : 'none';
+  elem.recognize.basicRecognitionOptions.style.display = !adv ? '' : 'none';
+  elem.recognize.textractOptions.style.display = (adv && isTextract) ? '' : 'none';
+  elem.recognize.textractFeatureOptions.style.display = (adv && isTextract) ? '' : 'none';
+  elem.recognize.textractAcceptChargesDiv.style.display = (adv && isTextract) ? '' : 'none';
+  elem.recognize.langOptions.style.display = (adv && isTextract) ? 'none' : '';
+  if (adv && isTextract) {
+    updateTextractRecognizeButton();
+  }
 });
+
+function updateTextractRecognizeButton() {
+  const isTextract = elem.info.enableAdvancedRecognition.checked
+    && elem.recognize.oemLabelText.innerHTML === 'Textract';
+  if (!isTextract) return;
+  const hasCredentials = elem.recognize.textractAccessKeyId.value.trim() !== ''
+    && elem.recognize.textractSecretAccessKey.value.trim() !== '';
+  elem.recognize.recognizeAll.disabled = !elem.recognize.textractAcceptCharges.checked || !hasCredentials;
+}
+
+elem.recognize.textractAcceptCharges.addEventListener('change', updateTextractRecognizeButton);
+elem.recognize.textractAccessKeyId.addEventListener('input', updateTextractRecognizeButton);
+elem.recognize.textractSecretAccessKey.addEventListener('input', updateTextractRecognizeButton);
 
 export const enableRecognitionClick = () => {
   elem.nav.navRecognizeTab.style.display = elem.info.enableRecognition.checked ? '' : 'none';
@@ -837,6 +865,30 @@ const langChoices = langChoiceElemArr.map((element) => element.id);
 elem.recognize.oemLabelOptionLstm.addEventListener('click', () => { setOemLabel('lstm'); });
 elem.recognize.oemLabelOptionLegacy.addEventListener('click', () => { setOemLabel('legacy'); });
 elem.recognize.oemLabelOptionCombined.addEventListener('click', () => { setOemLabel('combined'); });
+elem.recognize.oemLabelOptionTextract.addEventListener('click', () => { setOemLabel('textract'); });
+
+elem.recognize.textractAnalyzeTables.addEventListener('change', () => {
+  if (elem.recognize.textractAnalyzeTables.checked) {
+    elem.recognize.textractAnalyzeLayout.checked = true;
+  }
+});
+
+elem.recognize.textractAnalyzeLayout.addEventListener('change', () => {
+  if (!elem.recognize.textractAnalyzeLayout.checked) {
+    elem.recognize.textractAnalyzeTables.checked = false;
+  }
+});
+
+document.querySelectorAll('.textract-toggle-vis').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const input = document.getElementById(btn.getAttribute('data-target'));
+    const isPassword = input.type === 'password';
+    input.type = isPassword ? 'text' : 'password';
+    btn.innerHTML = isPassword
+      ? '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z"/><path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0"/><path d="M.646 2.646a.5.5 0 0 1 .708-.708l14 14a.5.5 0 0 1-.708.708z"/></svg>'
+      : '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z"/><path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0"/></svg>';
+  });
+});
 
 elem.recognize.psmLabelOption3.addEventListener('click', () => { setPsmLabel('3'); });
 elem.recognize.psmLabelOption4.addEventListener('click', () => { setPsmLabel('4'); });
@@ -857,6 +909,22 @@ function setOemLabel(x) {
     elem.recognize.oemLabelText.innerHTML = 'Legacy';
   } else if (x.toLowerCase() === 'combined') {
     elem.recognize.oemLabelText.innerHTML = 'Combined';
+  } else if (x.toLowerCase() === 'textract') {
+    elem.recognize.oemLabelText.innerHTML = 'Textract';
+  }
+
+  const isTextract = x.toLowerCase() === 'textract';
+  elem.recognize.buildOptions.style.display = isTextract ? 'none' : '';
+  elem.recognize.textractOptions.style.display = isTextract ? '' : 'none';
+  elem.recognize.textractFeatureOptions.style.display = isTextract ? '' : 'none';
+  elem.recognize.textractAcceptChargesDiv.style.display = isTextract ? '' : 'none';
+  elem.recognize.advancedRecognitionOptions2.style.display = isTextract ? 'none' : '';
+  elem.recognize.advancedRecognitionOptions3.style.display = isTextract ? 'none' : '';
+  elem.recognize.langOptions.style.display = isTextract ? 'none' : '';
+  if (isTextract) {
+    updateTextractRecognizeButton();
+  } else {
+    elem.recognize.recognizeAll.disabled = false;
   }
 }
 
@@ -968,7 +1036,68 @@ const parseStringToObject = (input) => {
   return result;
 };
 
+async function recognizeTextractClick() {
+  const accessKeyId = elem.recognize.textractAccessKeyId.value.trim();
+  const secretAccessKey = elem.recognize.textractSecretAccessKey.value.trim();
+  const sessionToken = elem.recognize.textractSessionToken.value.trim() || undefined;
+  const region = elem.recognize.textractRegion.value.trim() || 'us-east-1';
+  const analyzeLayout = elem.recognize.textractAnalyzeLayout.checked;
+  const analyzeTables = elem.recognize.textractAnalyzeTables.checked;
+
+  if (!accessKeyId || !secretAccessKey || !elem.recognize.textractAcceptCharges.checked) {
+    return;
+  }
+
+  elem.recognize.recognizeAll.disabled = true;
+
+  ProgressBars.active = ProgressBars.recognize;
+  ProgressBars.active.show(scribe.data.image.pageCount + 1, 0);
+
+  const engineName = RecognitionModelTextractBrowser.config.name;
+  if (!scribe.data.ocr[engineName]) scribe.data.ocr[engineName] = Array(scribe.data.image.pageCount);
+  scribe.data.ocr.active = scribe.data.ocr[engineName];
+  updateOcrVersionGUI();
+
+  try {
+    await scribe.recognize({
+      model: RecognitionModelTextractBrowser,
+      modelOptions: {
+        credentials: { accessKeyId, secretAccessKey, sessionToken },
+        region,
+        analyzeLayout,
+        analyzeTables,
+      },
+    });
+  } finally {
+    elem.recognize.recognizeAll.disabled = false;
+  }
+
+  ScribeViewer.displayPage(ScribeViewer.state.cp.n);
+
+  addVisInstructionsUI();
+
+  ProgressBars.active.fill();
+
+  if (scribe.data.font.state.enableOpt) {
+    elem.view.optimizeFont.disabled = false;
+    elem.view.optimizeFont.checked = true;
+  }
+
+  updateOcrVersionGUI();
+  toggleEditConfUI(false);
+  toggleEditButtons(false);
+  toggleLayoutButtons(false);
+}
+
 export async function recognizeAllClick() {
+  const isTextract = elem.info.enableAdvancedRecognition.checked
+    && elem.recognize.oemLabelText.innerHTML === 'Textract';
+
+  if (isTextract) {
+    await recognizeTextractClick();
+    return;
+  }
+
   // User can select engine directly using advanced options, or indirectly using basic options.
   /** @type {"legacy" | "lstm" | "combined"} */
   let oemMode;
@@ -983,23 +1112,29 @@ export async function recognizeAllClick() {
 
   setLangOpt();
 
+  elem.recognize.recognizeAll.disabled = true;
+
   ProgressBars.active = ProgressBars.recognize;
-  const progressMax = oemMode === 'combined' ? scribe.data.image.pageCount * 2 + 1 : scribe.data.image.pageCount + 1;
+  const progressMax = oemMode === 'combined' ? scribe.data.image.pageCount * 4 + 2 : scribe.data.image.pageCount + 1;
   ProgressBars.active.show(progressMax, 0);
 
-  await scribe.recognize({
-    modeAdv: oemMode,
-    langs: ScribeViewer.opt.langs,
-    combineMode: ScribeViewer.opt.combineMode,
-    vanillaMode: ScribeViewer.opt.vanillaMode,
-    config: parseStringToObject(elem.recognize.tessParameters.value),
-  });
+  try {
+    await scribe.recognize({
+      modeAdv: oemMode,
+      langs: ScribeViewer.opt.langs,
+      combineMode: ScribeViewer.opt.combineMode,
+      vanillaMode: ScribeViewer.opt.vanillaMode,
+      config: parseStringToObject(elem.recognize.tessParameters.value),
+    });
+  } finally {
+    elem.recognize.recognizeAll.disabled = false;
+  }
 
   ScribeViewer.displayPage(ScribeViewer.state.cp.n);
 
   addVisInstructionsUI();
 
-  ProgressBars.active.increment();
+  ProgressBars.active.fill();
 
   if (scribe.data.font.state.enableOpt) {
     elem.view.optimizeFont.disabled = false;
@@ -1206,7 +1341,12 @@ export function toggleEditConfUI(disable = true) {
 }
 
 export function toggleRecognizeUI(disable = true) {
-  elem.recognize.recognizeAll.disabled = disable;
+  const isTextract = elem.info.enableAdvancedRecognition.checked
+    && elem.recognize.oemLabelText.innerHTML === 'Textract';
+  const hasCredentials = elem.recognize.textractAccessKeyId.value.trim() !== ''
+    && elem.recognize.textractSecretAccessKey.value.trim() !== '';
+  elem.recognize.recognizeAll.disabled = disable
+    || (isTextract && (!elem.recognize.textractAcceptCharges.checked || !hasCredentials));
   elem.edit.recognizeArea.disabled = disable;
   elem.evaluate.createGroundTruth.disabled = disable;
   elem.evaluate.uploadOCRButton.disabled = disable;
@@ -1510,6 +1650,10 @@ elem.download.download.addEventListener('hidden.bs.collapse', (e) => {
   }
 });
 
+elem.nav.navDownload.addEventListener('show.bs.collapse', () => {
+  enableDisableDownloadPDFAlert();
+});
+
 elem.nav.navLayout.addEventListener('show.bs.collapse', (e) => {
   if (e.target instanceof HTMLElement && e.target.id === 'nav-layout') {
     ScribeViewer.state.layoutMode = true;
@@ -1718,7 +1862,7 @@ elem.info.downloadDebugCsv.addEventListener('click', async () => {
 // a user trying to add text to an image-based PDF may be surprised by this behavior.
 const pdfAlertElem = insertAlertMessage('To generate a PDF with invisible OCR text, select View > Display Mode > OCR Mode before downloading.', false, 'alertDownloadDiv', false);
 const enableDisableDownloadPDFAlert = () => {
-  const enable = elem.view.displayMode.value === 'proof' && elem.download.formatLabelText.textContent === 'PDF';
+  const enable = elem.view.displayMode.value === 'proof' && elem.download.formatLabelText.textContent === '.pdf';
 
   if (enable) {
     pdfAlertElem.setAttribute('style', '');
